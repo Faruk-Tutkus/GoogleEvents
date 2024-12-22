@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import * as Location from 'expo-location';
 import * as Calendar from 'expo-calendar';
-import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, arrayRemove, onSnapshot, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../config/FirebaseConfig';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,7 +32,30 @@ export default function EventDetailScreen() {
   useEffect(() => {
     getUserLocation();
     loadFavoritesFromFirebase();
-  }, []);
+    if (events.length === 0) return;
+
+  const unsubscribeListeners = events.map((event) => {
+    const eventDocRef = doc(db, 'events', event.id);
+    return onSnapshot(eventDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        setComments((prev) => ({
+          ...prev,
+          [event.id]: docSnapshot.data().comments || [],
+        }));
+      } else {
+        //console.warn(`Etkinlik ${event.id} bulunamadı. Yorumlar yüklenemedi.`);
+      }
+    });
+  });
+
+  return () => {
+    unsubscribeListeners.forEach((unsubscribe) => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    });
+  };
+  }, [events]);
 
   const getUserLocation = async () => {
     try {
@@ -110,7 +133,7 @@ const loadComments = async (eventId) => {
         [eventId]: eventDoc.data().comments || [],
       }));
     } else {
-      console.warn('Belge bulunamadı. Yorumlar yüklenemedi.');
+      //console.warn('Belge bulunamadı. Yorumlar yüklenemedi.');
     }
   } catch (error) {
     console.error('Yorumlar yüklenirken hata:', error);
@@ -125,23 +148,31 @@ const addComment = async (eventId, newComment) => {
   }
 
   const eventDocRef = doc(db, 'events', eventId);
-  const newCommentData = {
-    userId,
-    userName: user?.firstName || 'Bilinmeyen Kullanıcı',
-    text: newComment.trim(),
-    date: new Date().toISOString(),
-  };
-
-  // Update local state immediately
-  setComments((prev) => ({
-    ...prev,
-    [eventId]: [...(prev[eventId] || []), newCommentData],
-  }));
-
+  
   try {
+    // Kullanıcı adını Firebase'den al
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
+    const userName = userDoc.exists() ? userDoc.data()?.userName || 'Bilinmeyen Kullanıcı' : 'Bilinmeyen Kullanıcı';
+
+    const newCommentData = {
+      userId,
+      userName,
+      text: newComment.trim(),
+      date: new Date().toISOString(),
+    };
+
+    // Update local state immediately
+    setComments((prev) => ({
+      ...prev,
+      [eventId]: [...(prev[eventId] || []), newCommentData],
+    }));
+
+    // Firebase'de yorum ekle
     await updateDoc(eventDocRef, {
       comments: arrayUnion(newCommentData),
     });
+
     setNewComment('');
   } catch (error) {
     if (error.code === 'not-found') {
@@ -154,6 +185,7 @@ const addComment = async (eventId, newComment) => {
     }
   }
 };
+
 
 // Favorilere ekle veya çıkar
 const toggleFavorite = async (event) => {
