@@ -13,7 +13,7 @@ export default function StartScreen() {
   useEffect(() => {
     // Görsel ve yazı animasyonu
     Animated.spring(translateYAnim, {
-      toValue: -100,
+      toValue: -75,
       friction: 5,
       tension: 5,
       useNativeDriver: true,
@@ -31,7 +31,7 @@ export default function StartScreen() {
     <View style={[styles.container, { backgroundColor: '#4A4947' }]}>
       <Animated.View style={[styles.logoContainer, { transform: [{ translateY: translateYAnim }] }]}>
         <Animated.Image source={image} style={styles.image} />
-        <Text style={styles.text}>Cartol</Text>
+        <Text style={styles.text}>Activize</Text>
       </Animated.View>
       
       {!user && (

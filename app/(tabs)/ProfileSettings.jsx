@@ -88,17 +88,18 @@ export default function ProfileSettings() {
             style={styles.input}
             value={updatedName}
             onChangeText={setUpdatedName}
+            placeholderTextColor="#FAF7F0"
           />
         ) : (
           <Text style={styles.profileText}>Kullanıcı Adı: {profile.userName}</Text>
         )}
-        <Text style={styles.profileText}>E-posta: {profile.email}</Text>
-
         <TouchableOpacity
           style={styles.editButton}
           onPress={() => (editing ? updateProfile() : setEditing(true))}
         >
-          <Text style={styles.buttonText}>{editing ? 'Kaydet' : 'Düzenle'}</Text>
+          <Text style={styles.editButtonText}>
+            {editing ? 'Kaydet' : 'Düzenle'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -110,6 +111,8 @@ export default function ProfileSettings() {
           <Switch
             value={notificationEnabled}
             onValueChange={toggleNotification}
+            trackColor={{ false: '#767577', true: '#FAF7F0' }}
+            thumbColor={notificationEnabled ? '#4A4947' : '#f4f3f4'}
           />
         </View>
       </View>
@@ -128,7 +131,7 @@ export default function ProfileSettings() {
                   style={styles.deleteButton}
                   onPress={() => deleteFavorite(item)}
                 >
-                  <Icon name="delete" size={20} color="#FF6F61" />
+                  <Icon name="delete" size={20} color="#4A4947" />
                 </TouchableOpacity>
               </View>
             )}
@@ -146,57 +149,117 @@ export default function ProfileSettings() {
           router.replace('/startScreen');
         }}
       >
-        <Icon name="logout" size={20} color="#FFF" />
-        <Text style={styles.buttonText}>Çıkış Yap</Text>
+        <Icon name="logout" size={20} color="#4A4947" />
+        <Text style={styles.signOutButtonText}>Çıkış Yap</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
+// Stil tanımları
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 10 },
-  profileText: { fontSize: 16, marginBottom: 5 },
+  // Arka plan
+  container: {
+    flex: 1,
+    backgroundColor: '#4A4947', // SignUp ile aynı arka plan
+    paddingHorizontal: 20,
+  },
+  // Başlık
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FAF7F0',
+    marginTop: 50,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  // Bölüm kapsayıcı
+  section: {
+    backgroundColor: '#656565',
+    borderColor: '#252525',
+    borderWidth: 2,
+    borderRadius: 10,
+    padding: 15,
+    marginBottom: 20,
+  },
+  // Bölüm başlığı
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FAF7F0',
+    marginBottom: 10,
+  },
+  // Profil metinleri
+  profileText: {
+    fontSize: 16,
+    color: '#FAF7F0',
+    marginBottom: 5,
+  },
+  // Düzenlenebilir alan (kullanıcı adı) için giriş
   input: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    borderRadius: 5,
+    backgroundColor: '#656565',
+    borderColor: '#252525',
+    borderWidth: 2,
+    borderRadius: 10,
+    color: '#FAF7F0',
     padding: 10,
     fontSize: 16,
     marginBottom: 10,
   },
+  // Düzenle/Kaydet butonu
   editButton: {
-    backgroundColor: '#4A90E2',
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: '#FAF7F0',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#252525',
     alignItems: 'center',
+    padding: 10,
+    marginTop: 5,
   },
+  editButtonText: {
+    color: '#4A4947',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  // Bildirim bölümü
   notificationContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  // Favori etkinlik item
   favoriteItemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
   },
-  favoriteItem: { fontSize: 16 },
-  deleteButton: {
-    backgroundColor: '#FFF',
-    padding: 5,
-    borderRadius: 5,
+  favoriteItem: {
+    fontSize: 16,
+    color: '#FAF7F0',
   },
+  deleteButton: {
+    backgroundColor: '#FAF7F0',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#252525',
+    padding: 5,
+  },
+  // Çıkış yap butonu
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FF6F61',
+    backgroundColor: '#FAF7F0',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#252525',
     padding: 10,
-    borderRadius: 5,
   },
-  buttonText: { color: '#FFF', fontWeight: 'bold', fontSize: 16 },
+  signOutButtonText: {
+    color: '#4A4947',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginLeft: 8,
+  },
 });

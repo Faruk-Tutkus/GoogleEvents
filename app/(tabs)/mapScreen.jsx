@@ -10,7 +10,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
 import * as Linking from 'expo-linking';
 import axios from 'axios';
-
+import { darkMapStyle } from "../../constants/MapStyle";
 const TICKETMASTER_API_KEY = 'UGiA3kpVaWCmHMp36mCf9wu7wnNbeZbF';
 
 export default function MapScreen() {
@@ -61,8 +61,8 @@ export default function MapScreen() {
           params: {
             apikey: TICKETMASTER_API_KEY,
             latlong: `${latitude},${longitude}`,
-            radius: 200, // 20 km yarıçapında etkinlikler
-            size: 20, // Maksimum 20 etkinlik
+            radius: 500, // 20 km yarıçapında etkinlikler
+            size: 50, // Maksimum 20 etkinlik
           },
         }
       );
@@ -75,7 +75,6 @@ export default function MapScreen() {
           longitude: parseFloat(event._embedded.venues[0].location.longitude),
           description: event.info || 'Etkinlik açıklaması mevcut değil.',
         }));
-
         setEvents(eventsData);
       } else {
         Alert.alert('Uyarı', 'Yakında etkinlik bulunamadı.');
@@ -97,7 +96,7 @@ export default function MapScreen() {
   return (
     <View style={styles.container}>
       {loading || !location ? (
-        <ActivityIndicator size="large" color="#4A90E2" />
+        <ActivityIndicator size="large" color="#FAF7F0" style={{ marginTop: 100 }} />
       ) : (
         <MapView style={styles.map} initialRegion={location}>
           {/* Kullanıcının mevcut konumu */}
@@ -107,7 +106,7 @@ export default function MapScreen() {
               longitude: location.longitude,
             }}
             title="Mevcut Konumunuz"
-            pinColor="blue"
+            pinColor="#FAF7F0"
           />
 
           {/* Etkinlik Noktaları */}
@@ -130,7 +129,7 @@ export default function MapScreen() {
 
       <View style={styles.infoContainer}>
         <Text style={styles.infoText}>
-          Bir etkinlik pinine tıklayın ve yön tarifi almak için bilgi kutusuna dokunun!
+          Bir etkinlik pinine dokunup baloncuğa tıklayarak yol tarifi alabilirsiniz!
         </Text>
       </View>
     </View>
@@ -138,25 +137,36 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  map: { flex: 1 },
+  // Ekran arka planı
+  container: {
+    flex: 1,
+    backgroundColor: '#4A4947', // SignUp ile uyumlu arka plan
+  },
+  map: {
+    flex: 1,
+  },
+  // Bilgi metninin bulunduğu alt kısım
   infoContainer: {
-    backgroundColor: '#FFF',
-    padding: 10,
+    backgroundColor: '#656565', // SignUp input background
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#252525',
+    padding: 15,
     position: 'absolute',
-    bottom: 20,
+    bottom: 40,
     left: 20,
     right: 20,
-    borderRadius: 10,
+    // Gölge efekti (Android'de elevation, iOS'da shadow)
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
+    marginBottom:75
   },
   infoText: {
-    textAlign: 'center',
+    color: '#FAF7F0',
     fontSize: 14,
-    color: '#333',
+    textAlign: 'center',
   },
 });

@@ -9,6 +9,8 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  Image,
+  Animated,
 } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
@@ -22,12 +24,34 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tümü');
+  const [isFocusedSearch, setIsFocusedSearch] = useState(false);
 
-  const categories = ['Tümü', 'Music', 'Sports', 'Arts & Theatre', 'Technology'];
+  // Label animasyonu (SignUp ekranında olduğu gibi)
+  const searchLabelAnim = React.useRef(new Animated.Value(0)).current;
+
+  const categories = [
+    'Tümü',
+    'Music',
+    'Sports',
+    'Arts & Theatre',
+    'Technology',
+    'Family',
+    'Comedy',
+    'Film',
+  ];
 
   useEffect(() => {
     requestLocationAndFetchEvents();
   }, []);
+
+  useEffect(() => {
+    // TextInput’a odaklanma/çıkma durumuna göre label animasyonu
+    Animated.timing(searchLabelAnim, {
+      toValue: isFocusedSearch || searchQuery ? -35 : -2,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  }, [isFocusedSearch, searchQuery]);
 
   // Kullanıcıdan konum izni al ve etkinlikleri çek
   const requestLocationAndFetchEvents = async () => {
@@ -61,8 +85,8 @@ export default function Home() {
           params: {
             apikey: TICKETMASTER_API_KEY,
             latlong: `${coords.latitude},${coords.longitude}`,
-            radius: 2000, // 20 km yarıçapında etkinlikler
-            size: 20, // Maksimum 20 etkinlik
+            radius: 500,
+            size: 50,
           },
         }
       );
@@ -117,51 +141,67 @@ export default function Home() {
     setFilteredEvents(filtered);
   };
 
+  const animatedLabelStyle = {
+    transform: [{ translateY: searchLabelAnim }],
+    fontSize: 20,
+    color: '#FAF7F0',
+    position: 'absolute',
+    left: 45,
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={[styles.header, { marginTop: 50 }]}>Yakındaki Etkinlikler</Text>
+      <Text style={styles.header}>Yakındaki Etkinlikler</Text>
 
       {/* Arama Çubuğu */}
-      <View style={styles.searchContainer}>
-        <Icon name="magnify" size={24} color="#555" />
+      <View style={styles.inputContainer}>
+        <Icon name="magnify" size={24} color="#FAF7F0" style={styles.icon} />
+        <Animated.Text style={animatedLabelStyle}>Ara</Animated.Text>
         <TextInput
-          style={styles.searchInput}
-          placeholder="Etkinlik ara..."
+          style={styles.input}
           value={searchQuery}
           onChangeText={handleSearch}
+          onFocus={() => setIsFocusedSearch(true)}
+          onBlur={() => setIsFocusedSearch(false)}
+          placeholderTextColor="#FAF7F0"
+          cursorColor="#FAF7F0"
         />
       </View>
 
       {/* Kategori Filtreleme */}
       <View style={styles.categoriesContainer}>
-        {categories.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryButton,
-              selectedCategory === category && styles.categoryButtonSelected,
-            ]}
-            onPress={() => handleCategoryFilter(category)}
-          >
-            <Text
+        {categories.map((category) => {
+          const isSelected = selectedCategory === category;
+          return (
+            <TouchableOpacity
+              key={category}
               style={[
-                styles.categoryText,
-                selectedCategory === category && styles.categoryTextSelected,
+                styles.categoryButton,
+                isSelected && styles.categoryButtonSelected,
               ]}
+              onPress={() => handleCategoryFilter(category)}
             >
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
+              <Text
+                style={[
+                  styles.categoryText,
+                  isSelected && styles.categoryTextSelected,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
 
       {/* Etkinlik Listesi */}
       {loading ? (
-        <ActivityIndicator size="large" color="#4A90E2" />
+        <ActivityIndicator size="large" color="#FAF7F0" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={filteredEvents}
           keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 125 }}
           renderItem={({ item }) => (
             <View style={styles.eventCard}>
               <Text style={styles.eventTitle}>{item.name}</Text>
@@ -176,30 +216,91 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF', padding: 10 },
-  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  searchContainer: {
+  container: {
+    flex: 1,
+    backgroundColor: '#4A4947', // SignUp arka plan rengi
+    paddingHorizontal: 20,
+  },
+  header: {
+    color: '#FAF7F0',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 50,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  // Arama input container
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
+    position: 'relative',
+    width: '100%',
+    height: 70,
+    backgroundColor: '#656565',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#252525',
     paddingHorizontal: 10,
-    borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: 20,
+    
   },
-  searchInput: { flex: 1, padding: 10, fontSize: 16 },
-  categoriesContainer: { flexDirection: 'row', justifyContent: 'space-around' },
-  categoryButton: { padding: 8, borderRadius: 20, backgroundColor: '#E0E0E0' },
-  categoryButtonSelected: { backgroundColor: '#4A90E2' },
-  categoryText: { fontSize: 14, color: '#555' },
-  categoryTextSelected: { color: '#FFF' },
+  icon: {
+    position: 'absolute',
+    left: 10,
+  },
+  input: {
+    flex: 1,
+    fontSize: 20,
+    color: '#FAF7F0',
+    paddingLeft: 40,
+  },
+  // Kategori butonları
+  categoriesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
+  categoryButton: {
+    backgroundColor: '#656565',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    margin: 5,
+  },
+  categoryButtonSelected: {
+    backgroundColor: '#FAF7F0',
+  },
+  categoryText: {
+    color: '#FAF7F0',
+    fontSize: 14,
+  },
+  categoryTextSelected: {
+    color: '#4A4947',
+    fontWeight: 'bold',
+  },
+  // Etkinlik kartları
   eventCard: {
+    backgroundColor: '#656565',
+    borderColor: '#252525',
+    borderWidth: 2,
+    borderRadius: 10,
     padding: 15,
     marginVertical: 5,
-    backgroundColor: '#F9F9F9',
-    borderRadius: 10,
-    elevation: 2,
   },
-  eventTitle: { fontSize: 16, fontWeight: 'bold' },
-  eventDate: { fontSize: 14, color: '#777' },
-  eventDescription: { fontSize: 14, color: '#555' },
+  eventTitle: {
+    fontSize: 18,
+    color: '#FAF7F0',
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  eventDate: {
+    fontSize: 14,
+    color: '#FAF7F0',
+    marginBottom: 5,
+  },
+  eventDescription: {
+    fontSize: 14,
+    color: '#FAF7F0',
+  },
 });

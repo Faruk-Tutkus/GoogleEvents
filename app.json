@@ -4,7 +4,7 @@
     "slug": "GoogleEvents",
     "version": "1.0.0",
     "orientation": "portrait",
-    "backgroundColor": "#4A4947",
+    "backgroundColor": "#ffffff",
     "icon": "./assets/images/icon.png",
     "scheme": "Cartol",
     "userInterfaceStyle": "automatic",

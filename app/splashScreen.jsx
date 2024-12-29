@@ -3,7 +3,7 @@ import { View, Text, Animated, Image, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 export default function SplashScreen() {
     const [displayText, setDisplayText] = useState('');
-    const fullText = 'cartol';
+    const fullText = 'Activize';
 
     const fadeAnim = useRef(new Animated.Value(0)).current;
     const translateYAnim = useRef(new Animated.Value(-250)).current;

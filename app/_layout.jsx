@@ -65,7 +65,6 @@ export default function RootLayout() {
         <Stack.Screen name="startScreen" options={{animation: 'none'}}/>
         <Stack.Screen name="(auth)" options={{animation: 'slide_from_right'}}/>
         <Stack.Screen name="(tabs)" options={{animation: 'slide_from_right'}}/>
-        <Stack.Screen name="(add)" options={{animation: 'slide_from_right'}}/>
       </Stack>
     </ClerkLoaded>
   </ClerkProvider>

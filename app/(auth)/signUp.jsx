@@ -40,7 +40,7 @@ export default function SignUp() {
   const [textSize, setTextSize] = useState(0)
   const [name, setName] = useState("")
   const userData = {
-    userName: name,
+    userName: name || `Kullanıcı${Math.floor(Math.random() * 1000)}`,
     notification: true,
   };
   console.log(userData)
