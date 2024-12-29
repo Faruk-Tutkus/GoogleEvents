@@ -38,9 +38,8 @@ export default function SignUp() {
   const [pendingVerification, setPendingVerification] = useState(false)
   const [message, setMessage] = useState('')
   const [textSize, setTextSize] = useState(0)
-  const [name, setName] = useState("")
   const userData = {
-    userName: name || `Kullanıcı${Math.floor(Math.random() * 1000)}`,
+    userName: `Kullanıcı${Math.floor(Math.random() * 1000)}`,
     notification: true,
   };
   console.log(userData)
@@ -75,7 +74,6 @@ export default function SignUp() {
       await signUp.create({
         emailAddress: email,
         password: password,
-        firstName: name
       })
 
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' })
@@ -219,18 +217,8 @@ export default function SignUp() {
   const handleEmailChange = (text) => {
     setEmail(text);
   };
-  
-  const handleNameChange = (text) => {
-    setName(text);
-  };
 
   useEffect(() => {
-    Animated.timing(nameLabelAnim, {
-      toValue: isFocusedName || name ? -35 : -2,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-
     Animated.timing(emailLabelAnim, {
       toValue: isFocusedEmail || email ? -35 : -2,
       duration: 200,
@@ -254,7 +242,7 @@ export default function SignUp() {
       duration: 200,
       useNativeDriver: true,
     }).start();
-  }, [isFocusedEmail, isFocusedPassword, isFocusedName, isFocusedCode, isFocusedRePassword, email, password, name]);
+  }, [isFocusedEmail, isFocusedPassword, isFocusedCode, isFocusedRePassword, email, password]);
 
   const animatedLabelStyle = (animation) => ({
     transform: [{ translateY: animation }],
@@ -271,7 +259,7 @@ export default function SignUp() {
       alignItems: 'center',
       backgroundColor: '#4A4947',
       paddingHorizontal: 20,
-      padding: 100,
+      padding: 50,
     },
     text: {
       textAlign: 'center',
@@ -392,20 +380,6 @@ export default function SignUp() {
           {!pendingVerification && (
             <>
               <View>
-                <View style={[styles.inputContainer, { marginTop: 20 }]}>
-                  <Icon name="account-circle" size={24} color="#FAF7F0" style={styles.icon} />
-                  <Animated.Text style={animatedLabelStyle(nameLabelAnim)}>Kullanıcı Adı</Animated.Text>
-                  <TextInput
-                    value={name}
-                    onChangeText={handleNameChange}
-                    onFocus={() => setIsFocusedName(true)}
-                    onBlur={() => setIsFocusedName(false)}
-                    autoCapitalize="none"
-                    keyboardType="default"
-                    cursorColor={'#FAF7F0'}
-                    style={styles.input}
-                  />
-                </View>
                 <View style={[styles.inputContainer, { marginTop: 20 }]}>
                   <Icon name="email" size={24} color="#FAF7F0" style={[styles.icon]} />
                   <Animated.Text style={animatedLabelStyle(emailLabelAnim)}>E-mail</Animated.Text>
